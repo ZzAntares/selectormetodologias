@@ -11,6 +11,16 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
 
 ### Listar todas las preguntas [GET]
 
++ Attributes (array)
+    + (object)
+        + id: 1 (number) - Identificador de la pregunta.
+        + question: ¿La dimensión del proyecto se considera grande? (string) - Pregunta textual.
+        + criteria: Dimensión del proyecto (string) - Criterio con el cual se asocia la pregunta.
+        + evaluations (array) - Lista con la ponderación de la pregunta para cada metodología.
+            + (object)
+                + methodology: 1 (string) - ID de la metodología a la que corresponde la ponderación.
+                + evaluation: 3 (string) - Ponderación dada a la metodología para esta pregunta.
+
 + Response 200 (application/json)
 
         [
@@ -18,7 +28,6 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
                 "id": 1,
                 "question": "Es el presupuesto para el proyecto limitado?",
                 "criteria": "Dimensión del proyecto",
-                "published_at": "2015-08-05T08:40:51.620Z",
                 "evaluations":
                 [
                     {
@@ -33,25 +42,25 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
                         "methodology": 3,
                         "evaluation": 5
                     }
-                ],
-                "choices": [
-                    {
-                        "id": 1,
-                        "choice": "Si",
-                    }, {
-                        "id": 0,
-                        "choice": "No",
-                    }
                 ]
             }
         ]
 
 ### Crear nueva pregunta [POST]
 
++ Attributes
+    + question: ¿La dimensión del proyecto se considera grande? (string, required) - Pregunta que se añadirá al sistema.
+    + criteria: Dimensión del proyecto (string, required) - Criterio con el cual se asocia la pregunta.
+    + evaluations (array) - Lista con la ponderación de la pregunta para cada metodología. Si la lista esta incompleta se dará una ponderación por default de `0` para las metodologías no específicadas.
+        + (object)
+            + methodology: 1 (string, required) - ID de la metodología a la que corresponde la ponderación.
+            + evaluation: 3 (string) - Ponderación dada a la metodología para esta pregunta. El valor dado debe estar en el rango `[1..5]` si se especifica otro valor se producirá un error.
+
 + Request (application/json)
 
         {
             "question": "La dimensión del proyecto se considera grande?",
+            "criteria": "Dimensión del proyecto",
             "evaluations":
             [
                 {
@@ -66,14 +75,19 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
                     "methodology": 3,
                     "evaluation": 5
                 }
-            ],
-            "choices": [
-                "Si",
-                "No"
             ]
         }
 
 + Response 201 (application/json)
+
+    + Attributes
+        + id: 1 (number) - Identificador de la pregunta.
+        + question: ¿La dimensión del proyecto se considera grande? (string) - Pregunta textual.
+        + criteria: Dimensión del proyecto (string) - Criterio con el cual se asocia la pregunta.
+        + evaluations (array) - Lista con la ponderación de la pregunta para cada metodología.
+            + (object)
+                + methodology: 1 (string) - ID de la metodología a la que corresponde la ponderación.
+                + evaluation: 3 (string) - Ponderación dada a la metodología para esta pregunta.
 
     + Headers
 
@@ -84,7 +98,7 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
             {
                 "id": 2,
                 "question": "La dimensión del proyecto se considera grande?",
-                "published_at": "2015-08-05T08:40:51.620Z",
+                "criteria": "Dimensión del proyecto",
                 "evaluations":
                 [
                     {
@@ -99,15 +113,6 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
                         "methodology": 3,
                         "evaluation": 5
                     }
-                ],
-                "choices": [
-                    {
-                        "id": 1,
-                        "choice": "Si"
-                    }, {
-                        "id": 0,
-                        "choice": "No"
-                    }
                 ]
             }
 
@@ -115,48 +120,59 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
 ## Pregunta [/questions/{question_id}]
 
 + Parameters
-    + question_id: `1` (number, required) - ID numérico de la pregunta que desea manipular.
+    + question_id: 1 (number, required) - ID numérico de la pregunta que desea manipular.
 
 ### Consultar detalles de una pregunta [GET]
 
 + Response 200 (application/json)
 
-        {
-            "id": 2,
-            "question": "La dimensión del proyecto se considera grande?",
-            "published_at": "2015-08-05T08:40:51.620Z",
-            "evaluations":
-            [
-                {
-                    "methodology": 1,
-                    "evaluation": 3
-                },
-                {
-                    "methodology": 2,
-                    "evaluation": 1
-                },
-                {
-                    "methodology": 3,
-                    "evaluation": 5
-                }
-            ],
-            "choices": [
-                {
-                    "id": 1,
-                    "choice": "Si"
-                }, {
-                    "id": 0,
-                    "choice": "No"
-                }
-            ]
-        }
+    + Attributes
+        + id: 1 (number) - Identificador de la pregunta.
+        + question: ¿La dimensión del proyecto se considera grande? (string) - Pregunta textual.
+        + criteria: Dimensión del proyecto (string) - Criterio con el cual se asocia la pregunta.
+        + evaluations (array) - Lista con la ponderación de la pregunta para cada metodología.
+            + (object)
+                + methodology: 1 (string) - ID de la metodología a la que corresponde la ponderación.
+                + evaluation: 3 (string) - Ponderación dada a la metodología para esta pregunta.
+
+    + Body
+
+            {
+                "id": 2,
+                "question": "La dimensión del proyecto se considera grande?",
+                "criteria": "Dimensión del proyecto",
+                "evaluations":
+                [
+                    {
+                        "methodology": 1,
+                        "evaluation": 3
+                    },
+                    {
+                        "methodology": 2,
+                        "evaluation": 1
+                    },
+                    {
+                        "methodology": 3,
+                        "evaluation": 5
+                    }
+                ]
+            }
 
 ### Editar una pregunta [PUT]
+
+Solo se modificarán los atributos especificados en el request.
+
++ Attributes
+    + question: ¿La dimensión del proyecto se considera amplia? (string) - Pregunta con la modificiación que se actualizará en el sistema.
+    + criteria: Dimensión del proyecto (string) - Criterio con el cual se asocia la pregunta.
+    + evaluations (array) - Lista con la ponderación de la pregunta para cada metodología.
+        + (object).
+            + methodology: 1 (string) - ID de la metodología a la que corresponde la ponderación.
+            + evaluation: 3 (string) - Ponderación dada a la metodología para esta pregunta. El valor dado debe estar en el rango `[1..5]` si se especifica otro valor se producirá un error.
 
 + Request (application/json)
 
         {
-            "id": 1,
             "question": "La dimensión del proyecto se considera amplia?",
             "evaluations":
             [
@@ -172,49 +188,42 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
                     "methodology": 3,
                     "evaluation": 3
                 }
-            ],
-            "choices": [
-                {
-                    "id": 1,
-                    "choice": "Si",
-                }, {
-                    "id": 0,
-                    "choice": "No",
-                }
             ]
         }
 
 + Response 200 (application/json)
 
-        {
-            "id": 2,
-            "question": "La dimensión del proyecto se considera grande?",
-            "published_at": "2015-08-05T08:40:51.620Z",
-            "evaluations":
-            [
-                {
-                    "methodology": 1,
-                    "evaluation": 1
-                },
-                {
-                    "methodology": 2,
-                    "evaluation": 5
-                },
-                {
-                    "methodology": 3,
-                    "evaluation": 3
-                }
-            ],
-            "choices": [
-                {
-                    "id": 1,
-                    "choice": "Si",
-                }, {
-                    "id": 0,
-                    "choice": "No",
-                }
-            ]
-        }
+    + Attributes
+        + id: 1 (number) - Identificador de la pregunta.
+        + question: ¿La dimensión del proyecto se considera grande? (string) - Pregunta textual.
+        + criteria: Dimensión del proyecto (string) - Criterio con el cual se asocia la pregunta.
+        + evaluations (array) - Lista con la ponderación de la pregunta para cada metodología.
+            + (object)
+                + methodology: 1 (string) - ID de la metodología a la que corresponde la ponderación.
+                + evaluation: 3 (string) - Ponderación dada a la metodología para esta pregunta.
+
+    + Body
+
+            {
+                "id": 2,
+                "question": "La dimensión del proyecto se considera grande?",
+                "criteria": "Dimensión del proyecto",
+                "evaluations":
+                [
+                    {
+                        "methodology": 1,
+                        "evaluation": 1
+                    },
+                    {
+                        "methodology": 2,
+                        "evaluation": 5
+                    },
+                    {
+                        "methodology": 3,
+                        "evaluation": 3
+                    }
+                ]
+            }
 
 ### Eliminar una pregunta [DELETE]
 
@@ -229,21 +238,201 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
 
 + Response 200 (application/json)
 
-        [
-            {
-                "id": 223,
-                "name": "Scrum",
-                "links": [
-                    {
-                        "href": "methodologies/223",
-                        "rel": "self",
-                        "type": "GET"
-                    }
-                ]
+    + Attributes (array)
+        + (object)
+            + id: 223 (number) - Identificador de la metodología.
+            + name: Scrum (string) - Nombre de la metodología.
+            + links (array) - Enlaces HATEOAS
+                + (object)
+                    + href: methodologies/223 (string) - Ruta relativa para consultar detalles de la metodología sugerida.
+                    + rel: self (string) - Recurso relacionado con el enlace.
+                    + type: GET (string) - Tipo de request que debe hacerse al enlace.
+
+    + Body
+
+            [
+                {
+                    "id": 223,
+                    "name": "Scrum",
+                    "links": [
+                        {
+                            "href": "methodologies/223",
+                            "rel": "self",
+                            "type": "GET"
+                        }
+                    ]
+                },
+                {
+                    "id": 221,
+                    "name": "Xtreme Programming",
+                    "links": [
+                        {
+                            "href": "methodologies/221",
+                            "rel": "self",
+                            "type": "GET"
+                        }
+                    ]
+                }
+            ]
+
+### Crear una metodología [POST]
+
++ Attributes
+    + name: Rup (string, required) - Nombre de la metodología.
+    + abstract: Bla bla bla (string, required) - Descripción corta de la metodología.
+    + quality_features: Bla bla bla (string) - Características de calidad que promueve.
+    + info: http://../rup.html (string, required) - URL externo donde hay más información al respecto.
+    + type: tradicional (string, required) - Tipo de la metodología (`tradicional`, `ágil`, `moviles`, etc).
+    + model: espiral (string, required) - Modelo utilizado por la metodología (`cascada`, `incremental`, `iterativo`, `espiral`, `prototipos`, etc).
+    + diagrams (object, required) - Diagramas de proceso, roles, artefactos y prácticas de la metodología.
+        + process: http://.../rup.process.png (string, required) - URL hacia el diagrama del proceso de la metodología.
+        + roles: http://.../rup/roles.jpg (string) - URL hacia el diagrama de roles de la metodología.
+        + artifacts: http://.../rup/artifacts.jpeg (string) - URL hacia el diagrama de artefactos de la metodología.
+        + practices: http://.../rup/practices.jpeg (string) - URL hacia el diagrama de prácticas de la metodología.
+    + description (object, required) - Descripción de la metodología (proceso, roles, artefactos, practicas, tips y herramientas).
+        + process (array, required) - Descripción de las etapas del proceso de la metodología.
+            + (object)
+                + stage: 1 (number) - Número de la etapa en el proceso de la metodología.
+                + name: Inception (string) - Nombre de la etapa en el proceso de la metodología.
+                + description: The idea for the project is stated (string) - Descripción de la etapa en el proceso de la metodología.
+                + image: http://.../rup/stage/1/inception.jpg (string) - URL hacia una imagen de apoyo para la etapa del proceso de la metodología.
+        + roles (array) - Roles identificados en la metodología.
+            + (object)
+                + name: Senior developer (string) - Nombre del rol identificado en la metodología.
+                + description: Bla bla bla (string) - Descripción del rol identificado en la metodología.
+                + image: http://...../rup/role/1/avatar.jpg (string) - URL hacia una imagen de apoyo para el rol identificado en la metodología.
+        + artifacts (array) - Artefactos producidos al seguir la metodología.
+            + (object)
+                + name: Code documentation (string) - Nombre del artefacto producido en la metodología.
+                + description: Bla bla bla (string) - Descripción del artefacto que se produce en la metodología.
+                + image: http://..../rup/artifact/1/documentation.jpg (string) - URL hacia una imagen de apoyo para el artefacto producido en la metodología.
+        + practices (array) - Practicas realizadas al sequir la metodología.
+            + (object)
+                + name: Pair programming (string) - Nombre de la práctica que se sigue en la metodología.
+                + description: Bla bla bla (string) - Descripción de la práctica que se sigue en la metodología.
+                + image: http://....../rup/practices/1/ppg.png (string) - URL hacia una imagen de apoyo para la práctica que se sigue en la metodología.
+                + produces_artifacts (array[string]) - Artefactos que se producen durante esta práctica en la metodología.
+                    + Pruebas automatizadas
+        + tips (array[string]) - Tips para seguir, entender y facilitar la práctica de la metodología mejor la metodología.
+            + Bla bla bla
+        + tools (array) - Herramientas de apoyo al utilizar la metodología.
+            + (object)
+                + name: Trello (string) - Nombre de la herramienta.
+                + description: Bla bla bla (string) - Descripción de la herramienta que apoya en la metodología.
+                + website: http://trello.com/ (string) - URL externo con más detalles de la herramienta.
+
+
++ Request (application/json)
+
+        {
+            "name": "Rup",
+            "abstract": "Bla bla bla bla",
+            "quality_features": "Bla bla bla bla",
+            "info": "http://..../rup.html",
+            "type": "tradicional",
+            "model": "espiral",
+            "diagrams": {
+                "process": "http://....../rup/process.png",
+                "roles": "http://......../rup/roles.jpg",
+                "artifacts": "http://......../rup/artifacts.jpeg",
+                "practices": "http://......../rup/practices.jpeg"
             },
+            "description": {
+                "process": [
+                    {
+                        "stage": 1,
+                        "name": "Inception",
+                        "description": "The idea for the project is stated. The development team determines...",
+                        "image": "http://...../rup/stage/1/inception.jpg"
+                    },
+                    {
+                        "stage": 2,
+                        "name": "Elaboration",
+                        "description": "The project's architecture and required resources are further evaluated...",
+                        "image": "http://...../rup/stage/2/elaboration.jpg"
+                    },
+                    {
+                        "stage": 3,
+                        "name": "Construction",
+                        "description": "The project is developed and completed.",
+                        "image": "http://...../rup/stage/3/construction.jpg"
+                    },
+                    {
+                        "stage": 4,
+                        "name": "Transition",
+                        "description": "The software is released to the public",
+                        "image": "http://...../rup/stage/4/transition.jpg"
+                    }
+                ],
+                "roles": [
+                    {
+                        "name": "Senior developer",
+                        "description": "Bla bla bla bla",
+                        "image": "http://...../rup/role/1/avatar.jpg",
+                    },
+                    {
+                        "name": "Team leader",
+                        "description": "Bla bla bla bla",
+                        "image": "http://...../rup/role/2/avatar.jpg",
+                    }
+                ],
+                "artifacts": [
+                    {
+                        "name": "Code documentation",
+                        "description": "Bla bla bla",
+                        "image": "http://..../rup/artifact/1/documentation.jpg"
+                    }
+                ],
+                "practices": [
+                    {
+                        "name": "Pair programming",
+                        "description": "Bla bla bla",
+                        "image": "http://....../rup/practices/1/ppg.png",
+                        "produces_artifacts": [
+                            "Pruebas automatizadas"
+                        ]
+                    },
+                    {
+                        "tdd": "Test driven development",
+                        "description": "Bla bla bla",
+                        "image": "http://...../rup/practices/2/tdd.jpeg",
+                        "produces_artifacts": []
+                    }
+                ],
+                "tips": [
+                    "Bla bla bla"
+                ],
+                "tools": [
+                    {
+                        "name": "Trello",
+                        "description": "Bla bla bla",
+                        "website": "http://trello.com/"
+                    },
+                ]
+            }
+        }
+
++ Response 201 (application/json)
+
+    + Attributes (array)
+        + (object)
+            + id: 221 (number) - Identificador de la metodología.
+            + name: Rup (string) - Nombre de la metodología.
+            + links (array) - Enlaces HATEOAS
+                + (object)
+                    + href: methodologies/221 (string) - Ruta relativa para consultar detalles de la metodología sugerida.
+                    + rel: self (string) - Recurso relacionado con el enlace.
+                    + type: GET (string) - Tipo de request que debe hacerse al enlace.
+
+    + Headers
+
+            Location: /methodologies/221
+
+    + Body
+
             {
                 "id": 221,
-                "name": "Xtreme Programming",
+                "name": "Rup",
                 "links": [
                     {
                         "href": "methodologies/221",
@@ -252,101 +441,119 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
                     }
                 ]
             }
-        ]
 
-### Crear una metodología [POST]
+## Metodología [/methodologies/{methodology_id}]
 
-+ Request (application/json)
++ Parameters
+    + methodology_id: 1 (number, required) - ID numérico de la metodología que desea manipular.
 
-        {
-            "name": "Rup",
-            "abstract": "Bla bla bla bla",
-            "diagrams": {
-                "process": "http://....../rup/process.png",
-                "roles": "http://......../rup/roles.jpg",
-                "artifacts": "http://......../rup/artifacts.jpeg",
-                "practices": "http://......../rup/practices.jpeg",
-            },
-            "description": {
-                "process": "Bla bla bla bla bla",
-                "roles": [
-                    {
-                        "name": "Senior developer",
-                        "description": "Bla bla bla bla",
-                        "image": "http://...../rup/role/1/avatar.jpg",
-                        "produces_artifact": 1
-                    },
-                    {
-                        "name": "Team leader",
-                        "description": "Bla bla bla bla",
-                        "image": "http://...../rup/role/2/avatar.jpg",
-                        "produces_artifact": null
-                    }
-                ],
-                "artifacts": [
-                    {
-                        "id": 1,
-                        "name": "Code documentation",
-                        "description": "Bla bla bal",
-                        "image": "http://..../rup/artifact/1/documentation.jpg"
-                    }
-                ],
-                "practices": [
-                    {
-                        "name": "Pair programming",
-                        "description": "Bla bla bla",
-                        "image": "http://....../rup/practices/1/ppg.png"
-                        "produces_artifact": null,
-                    },
-                    {
-                        "tdd": "Test driven development",
-                        "description": "Bla bla bla",
-                        "image": "http://...../rup/practices/2/tdd.jpeg",
-                        "produces_artifact": 1
-                    }
-                ]
-            }
-        }
+### Consultar detalles de una metodología [GET]
 
-+ Response 201 (application/json)
++ Response 200 (application/json)
 
-    + Headers
-
-            Location: /methodologies/3
+    + Attributes
+        + name: Rup (string) - Nombre de la metodología.
+        + abstract: Bla bla bla (string) - Descripción corta de la metodología.
+        + quality_features: Bla bla bla (string) - Características de calidad que promueve.
+        + info: http://../rup.html (string) - URL externo donde hay más información al respecto.
+        + type: tradicional (string) - Tipo de la metodología (`tradicional`, `ágil`, `moviles`, etc).
+        + model: espiral (string) - Modelo utilizado por la metodología (`cascada`, `incremental`, `iterativo`, `espiral`, `prototipos`, etc).
+        + diagrams (object) - Diagramas de proceso, roles, artefactos y prácticas de la metodología.
+            + process: http://.../rup.process.png (string, required) - URL hacia el diagrama del proceso de la metodología.
+            + roles: http://.../rup/roles.jpg (string) - URL hacia el diagrama de roles de la metodología.
+            + artifacts: http://.../rup/artifacts.jpeg (string) - URL hacia el diagrama de artefactos de la metodología.
+            + practices: http://.../rup/practices.jpeg (string) - URL hacia el diagrama de prácticas de la metodología.
+        + description (object) - Descripción de la metodología (proceso, roles, artefactos, practicas, tips y herramientas).
+            + process (array) - Descripción de las etapas del proceso de la metodología.
+                + (object)
+                    + stage: 1 (number) - Número de la etapa en el proceso de la metodología.
+                    + name: Inception (string) - Nombre de la etapa en el proceso de la metodología.
+                    + description: The idea for the project is stated (string) - Descripción de la etapa en el proceso de la metodología.
+                    + image: http://.../rup/stage/1/inception.jpg (string) - URL hacia una imagen de apoyo para la etapa del proceso de la metodología.
+            + roles (array) - Roles identificados en la metodología.
+                + (object)
+                    + name: Senior developer (string) - Nombre del rol identificado en la metodología.
+                    + description: Bla bla bla (string) - Descripción del rol identificado en la metodología.
+                    + image: http://...../rup/role/1/avatar.jpg (string) - URL hacia una imagen de apoyo para el rol identificado en la metodología.
+            + artifacts (array) - Artefactos producidos al seguir la metodología.
+                + (object)
+                    + name: Code documentation (string) - Nombre del artefacto producido en la metodología.
+                    + description: Bla bla bla (string) - Descripción del artefacto que se produce en la metodología.
+                    + image: http://..../rup/artifact/1/documentation.jpg (string) - URL hacia una imagen de apoyo para el artefacto producido en la metodología.
+            + practices (array) - Practicas realizadas al sequir la metodología.
+                + (object)
+                    + name: Pair programming (string) - Nombre de la práctica que se sigue en la metodología.
+                    + description: Bla bla bla (string) - Descripción de la práctica que se sigue en la metodología.
+                    + image: http://....../rup/practices/1/ppg.png (string) - URL hacia una imagen de apoyo para la práctica que se sigue en la metodología.
+                    + produces_artifacts (array[string]) - Artefacto que se producen en esta practica de la metodología.
+                        + Pruebas automatizadas
+            + tips (array[string]) - Tips para seguir, entender y facilitar la práctica de la metodología.
+                Bla bla bla
+            + tools (array) - Herramientas de apoyo al utilizar la metodología.
+                + (object)
+                    + name: Trello (string) - Nombre de la herramienta.
+                    + description: Bla bla bla (string) - Descripción de la herramienta que apoya en la metodología.
+                    + website: http://trello.com/ (string) - URL externo con más detalles de la herramienta.
 
     + Body
 
             {
-                "id": 3,
+                "id": 223
                 "name": "Rup",
                 "abstract": "Bla bla bla bla",
+                "quality_features": "Bla bla bla bla",
+                "info": "http://..../rup.html",
+                "type": "tradicional",
+                "model": "espiral",
                 "diagrams": {
                     "process": "http://....../rup/process.png",
                     "roles": "http://......../rup/roles.jpg",
                     "artifacts": "http://......../rup/artifacts.jpeg",
-                    "practices": "http://......../rup/practices.jpeg",
+                    "practices": "http://......../rup/practices.jpeg"
                 },
                 "description": {
-                    "process": "Bla bla bla bla bla",
+                    "process": [
+                        {
+                            "stage": 1,
+                            "name": "Inception",
+                            "description": "The idea for the project is stated. The development team determines...",
+                            "image": "http://...../rup/stage/1/inception.jpg"
+                        },
+                        {
+                            "stage": 2,
+                            "name": "Elaboration",
+                            "description": "The project's architecture and required resources are further evaluated...",
+                            "image": "http://...../rup/stage/2/elaboration.jpg"
+                        },
+                        {
+                            "stage": 3,
+                            "name": "Construction",
+                            "description": "The project is developed and completed.",
+                            "image": "http://...../rup/stage/3/construction.jpg"
+                        },
+                        {
+                            "stage": 4,
+                            "name": "Transition",
+                            "description": "The software is released to the public",
+                            "image": "http://...../rup/stage/4/transition.jpg"
+                        }
+                    ],
                     "roles": [
                         {
                             "name": "Senior developer",
                             "description": "Bla bla bla bla",
-                            "image": "http://...../rup/role/1/avatar.jpg",
-                            "produces_artifact": 1
+                            "image": "http://...../rup/role/1/avatar.jpg"
                         },
                         {
                             "name": "Team leader",
                             "description": "Bla bla bla bla",
-                            "image": "http://...../rup/role/2/avatar.jpg",
-                            "produces_artifact": null
+                            "image": "http://...../rup/role/2/avatar.jpg"
                         }
                     ],
                     "artifacts": [
                         {
-                            "id": 1,
                             "name": "Code documentation",
-                            "description": "Bla bla bal",
+                            "description": "Bla bla bla",
                             "image": "http://..../rup/artifact/1/documentation.jpg"
                         }
                     ],
@@ -354,148 +561,243 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
                         {
                             "name": "Pair programming",
                             "description": "Bla bla bla",
-                            "image": "http://....../rup/practices/1/ppg.png"
-                            "produces_artifact": null,
+                            "image": "http://....../rup/practices/1/ppg.png",
+                            "produces_artifacts": [
+                                "Pruebas automatizadas"
+                            ]
                         },
                         {
                             "tdd": "Test driven development",
                             "description": "Bla bla bla",
                             "image": "http://...../rup/practices/2/tdd.jpeg",
-                            "produces_artifact": 1
+                            "produces_artifacts": []
                         }
+                    ],
+                    "tips": [
+                        "Bla bla bla"
+                    ],
+                    "tools": [
+                        {
+                            "name": "Trello",
+                            "description": "Bla bla bla",
+                            "website": "http://trello.com/"
+                        },
                     ]
                 }
             }
 
-## Metodología [/methodologies/{methodology_id}]
-
-+ Parameters
-    + methodology_id: `1` (number, required) - ID numérico de la metodología que desea manipular.
-
-### Consultar detalles de una metodología [GET]
-
-+ Response 200 (application/json)
-
-        {
-            "id": 223,
-            "name": "Rup",
-            "abstract": "Bla bla bla bla",
-            "diagrams": {
-                "process": "http://....../rup/process.png",
-                "roles": "http://......../rup/roles.jpg",
-                "artifacts": "http://......../rup/artifacts.jpeg",
-                "practices": "http://......../rup/practices.jpeg",
-            },
-            "description": {
-                "process": "Bla bla bla bla bla",
-                "roles": [
-                    {
-                        "name": "Senior developer",
-                        "description": "Bla bla bla bla",
-                        "image": "http://...../rup/role/1/avatar.jpg",
-                        "produces_artifact": 1
-                    },
-                    {
-                        "name": "Team leader",
-                        "description": "Bla bla bla bla",
-                        "image": "http://...../rup/role/2/avatar.jpg",
-                        "produces_artifact": null
-                    }
-                ],
-                "artifacts": [
-                    {
-                        "id": 1,
-                        "name": "Code documentation",
-                        "description": "Bla bla bal",
-                        "image": "http://..../rup/artifact/1/documentation.jpg"
-                    }
-                ],
-                "practices": [
-                    {
-                        "name": "Pair programming",
-                        "description": "Bla bla bla",
-                        "image": "http://....../rup/practices/1/ppg.png"
-                        "produces_artifact": null,
-                    },
-                    {
-                        "tdd": "Test driven development",
-                        "description": "Bla bla bla",
-                        "image": "http://...../rup/practices/2/tdd.jpeg",
-                        "produces_artifact": 1
-                    }
-                ]
-            }
-        }
-
 ### Editar una metodología [PUT]
+
++ Attributes
+    + name: Rup (string, required) - Nombre de la metodología.
+    + abstract: Bla bla bla (string, required) - Descripción corta de la metodología.
+    + quality_features: Bla bla bla (string) - Características de calidad que promueve.
+    + info: http://../rup.html (string, required) - URL externo donde hay más información al respecto.
+    + type: tradicional (string, required) - Tipo de la metodología (`tradicional`, `ágil`, `moviles`, etc).
+    + model: espiral (string, required) - Modelo utilizado por la metodología (`cascada`, `incremental`, `iterativo`, `espiral`, `prototipos`, etc).
+    + diagrams (object, required) - Diagramas de proceso, roles, artefactos y prácticas de la metodología.
+        + process: http://.../rup.process.png (string, required) - URL hacia el diagrama del proceso de la metodología.
+        + roles: http://.../rup/roles.jpg (string) - URL hacia el diagrama de roles de la metodología.
+        + artifacts: http://.../rup/artifacts.jpeg (string) - URL hacia el diagrama de artefactos de la metodología.
+        + practices: http://.../rup/practices.jpeg (string) - URL hacia el diagrama de prácticas de la metodología.
+    + description (object, required) - Descripción de la metodología (proceso, roles, artefactos, practicas, tips y herramientas).
+        + process (array, required) - Descripción de las etapas del proceso de la metodología.
+            + (object)
+                + stage: 1 (number) - Número de la etapa en el proceso de la metodología.
+                + name: Inception (string) - Nombre de la etapa en el proceso de la metodología.
+                + description: The idea for the project is stated (string) - Descripción de la etapa en el proceso de la metodología.
+                + image: http://.../rup/stage/1/inception.jpg (string) - URL hacia una imagen de apoyo para la etapa del proceso de la metodología.
+        + roles (array) - Roles identificados en la metodología.
+            + (object)
+                + name: Senior developer (string) - Nombre del rol identificado en la metodología.
+                + description: Bla bla bla (string) - Descripción del rol identificado en la metodología.
+                + image: http://...../rup/role/1/avatar.jpg (string) - URL hacia una imagen de apoyo para el rol identificado en la metodología.
+        + artifacts (array) - Artefactos producidos al seguir la metodología.
+            + (object)
+                + name: Code documentation (string) - Nombre del artefacto producido en la metodología.
+                + description: Bla bla bla (string) - Descripción del artefacto que se produce en la metodología.
+                + image: http://..../rup/artifact/1/documentation.jpg (string) - URL hacia una imagen de apoyo para el artefacto producido en la metodología.
+        + practices (array) - Practicas realizadas al sequir la metodología.
+            + (object)
+                + name: Pair programming (string) - Nombre de la práctica que se sigue en la metodología.
+                + description: Bla bla bla (string) - Descripción de la práctica que se sigue en la metodología.
+                + image: http://....../rup/practices/1/ppg.png (string) - URL hacia una imagen de apoyo para la práctica que se sigue en la metodología.
+                + produces_artifacts (array[string]) - Artefacto que se producen en esta practica de la metodología.
+                    + Pruebas automatizadas
+        + tips (array[string]) - Tips para seguir, entender y facilitar la práctica de la metodología.
+            Bla bla bla
+        + tools (array) - Herramientas de apoyo al utilizar la metodología.
+            + (object)
+                + name: Trello (string) - Nombre de la herramienta.
+                + description: Bla bla bla (string) - Descripción de la herramienta que apoya en la metodología.
+                + website: http://trello.com/ (string) - URL externo con más detalles de la herramienta.
+
 
 + Request (application/json)
 
         {
             "name": "Rup",
-            "abstract": "This is the abstract for this methodology."
-            "description": {
-                "process": "Bla bla bla bla bla",
-            }
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "id": 223,
-            "name": "Rup",
             "abstract": "This is the abstract for this methodology.",
-            "diagrams": {
-                "process": "http://....../rup/process.png",
-                "roles": "http://......../rup/roles.jpg",
-                "artifacts": "http://......../rup/artifacts.jpeg",
-                "practices": "http://......../rup/practices.jpeg",
-            },
             "description": {
-                "process": "Bla bla bla bla bla",
-                "roles": [
+                "tools": [
                     {
-                        "name": "Senior developer",
-                        "description": "Bla bla bla bla",
-                        "image": "http://...../rup/role/1/avatar.jpg",
-                        "produces_artifact": 1
+                        "name": "Trello",
+                        "description": "Bla bla bla",
+                        "website": "http://trello.com/"
                     },
                     {
-                        "name": "Team leader",
-                        "description": "Bla bla bla bla",
-                        "image": "http://...../rup/role/2/avatar.jpg",
-                        "produces_artifact": null
-                    }
-                ],
-                "artifacts": [
-                    {
-                        "id": 1,
-                        "name": "Code documentation",
-                        "description": "Bla bla bal",
-                        "image": "http://..../rup/artifact/1/documentation.jpg"
-                    }
-                ],
-                "practices": [
-                    {
-                        "name": "Pair programming",
-                        "description": "Bla bla bla",
-                        "image": "http://....../rup/practices/1/ppg.png"
-                        "produces_artifact": null,
-                    },
-                    {
-                        "tdd": "Test driven development",
-                        "description": "Bla bla bla",
-                        "image": "http://...../rup/practices/2/tdd.jpeg",
-                        "produces_artifact": 1
+                        "name": "Apiary",
+                        "description": "Ble ble ble",
+                        "website": "http://apiary.io/"
                     }
                 ]
             }
         }
 
++ Response 200 (application/json)
+
+    + Attributes
+        + name: Rup (string) - Nombre de la metodología.
+        + abstract: This is the abstract for this methodology. (string) - Descripción corta de la metodología.
+        + quality_features: Bla bla bla (string) - Características de calidad que promueve.
+        + info: http://../rup.html (string) - URL externo donde hay más información al respecto.
+        + type: tradicional (string) - Tipo de la metodología (`tradicional`, `ágil`, `moviles`, etc).
+        + model: espiral (string) - Modelo utilizado por la metodología (`cascada`, `incremental`, `iterativo`, `espiral`, `prototipos`, etc).
+        + diagrams (object) - Diagramas de proceso, roles, artefactos y prácticas de la metodología.
+            + process: http://.../rup.process.png (string, required) - URL hacia el diagrama del proceso de la metodología.
+            + roles: http://.../rup/roles.jpg (string) - URL hacia el diagrama de roles de la metodología.
+            + artifacts: http://.../rup/artifacts.jpeg (string) - URL hacia el diagrama de artefactos de la metodología.
+            + practices: http://.../rup/practices.jpeg (string) - URL hacia el diagrama de prácticas de la metodología.
+        + description (object) - Descripción de la metodología (proceso, roles, artefactos, practicas, tips y herramientas).
+            + process (array) - Descripción de las etapas del proceso de la metodología.
+                + (object)
+                    + stage: 1 (number) - Número de la etapa en el proceso de la metodología.
+                    + name: Inception (string) - Nombre de la etapa en el proceso de la metodología.
+                    + description: The idea for the project is stated (string) - Descripción de la etapa en el proceso de la metodología.
+                    + image: http://.../rup/stage/1/inception.jpg (string) - URL hacia una imagen de apoyo para la etapa del proceso de la metodología.
+            + roles (array) - Roles identificados en la metodología.
+                + (object)
+                    + name: Senior developer (string) - Nombre del rol identificado en la metodología.
+                    + description: Bla bla bla (string) - Descripción del rol identificado en la metodología.
+                    + image: http://...../rup/role/1/avatar.jpg (string) - URL hacia una imagen de apoyo para el rol identificado en la metodología.
+            + artifacts (array) - Artefactos producidos al seguir la metodología.
+                + (object)
+                    + name: Code documentation (string) - Nombre del artefacto producido en la metodología.
+                    + description: Bla bla bla (string) - Descripción del artefacto que se produce en la metodología.
+                    + image: http://..../rup/artifact/1/documentation.jpg (string) - URL hacia una imagen de apoyo para el artefacto producido en la metodología.
+            + practices (array) - Practicas realizadas al sequir la metodología.
+                + (object)
+                    + name: Pair programming (string) - Nombre de la práctica que se sigue en la metodología.
+                    + description: Bla bla bla (string) - Descripción de la práctica que se sigue en la metodología.
+                    + image: http://....../rup/practices/1/ppg.png (string) - URL hacia una imagen de apoyo para la práctica que se sigue en la metodología.
+                    + produces_artifacts (array[string]) - Artefacto que se producen en esta practica de la metodología.
+                        + Pruebas automatizadas
+            + tips (array[string]) - Tips para seguir, entender y facilitar la práctica de la metodología.
+                Bla bla bla
+            + tools (array) - Herramientas de apoyo al utilizar la metodología.
+                + (object)
+                    + name: Trello (string) - Nombre de la herramienta.
+                    + description: Bla bla bla (string) - Descripción de la herramienta que apoya en la metodología.
+                    + website: http://trello.com/ (string) - URL externo con más detalles de la herramienta.
+
+    + Body
+
+            {
+                "id": 223
+                "name": "Rup",
+                "abstract": "This is the abstract for this methodology.",
+                "quality_features": "Bla bla bla bla",
+                "info": "http://..../rup.html",
+                "type": "tradicional",
+                "model": "espiral",
+                "diagrams": {
+                    "process": "http://....../rup/process.png",
+                    "roles": "http://......../rup/roles.jpg",
+                    "artifacts": "http://......../rup/artifacts.jpeg",
+                    "practices": "http://......../rup/practices.jpeg"
+                },
+                "description": {
+                    "process": [
+                        {
+                            "stage": 1,
+                            "name": "Inception",
+                            "description": "The idea for the project is stated. The development team determines...",
+                            "image": "http://...../rup/stage/1/inception.jpg"
+                        },
+                        {
+                            "stage": 2,
+                            "name": "Elaboration",
+                            "description": "The project's architecture and required resources are further evaluated...",
+                            "image": "http://...../rup/stage/2/elaboration.jpg"
+                        },
+                        {
+                            "stage": 3,
+                            "name": "Construction",
+                            "description": "The project is developed and completed.",
+                            "image": "http://...../rup/stage/3/construction.jpg"
+                        },
+                        {
+                            "stage": 4,
+                            "name": "Transition",
+                            "description": "The software is released to the public",
+                            "image": "http://...../rup/stage/4/transition.jpg"
+                        }
+                    ],
+                    "roles": [
+                        {
+                            "name": "Senior developer",
+                            "description": "Bla bla bla bla",
+                            "image": "http://...../rup/role/1/avatar.jpg"
+                        },
+                        {
+                            "name": "Team leader",
+                            "description": "Bla bla bla bla",
+                            "image": "http://...../rup/role/2/avatar.jpg"
+                        }
+                    ],
+                    "artifacts": [
+                        {
+                            "name": "Code documentation",
+                            "description": "Bla bla bla",
+                            "image": "http://..../rup/artifact/1/documentation.jpg"
+                        }
+                    ],
+                    "practices": [
+                        {
+                            "name": "Pair programming",
+                            "description": "Bla bla bla",
+                            "image": "http://....../rup/practices/1/ppg.png",
+                            "produces_artifacts": [
+                                "Pruebas automatizadas"
+                            ]
+                        },
+                        {
+                            "tdd": "Test driven development",
+                            "description": "Bla bla bla",
+                            "image": "http://...../rup/practices/2/tdd.jpeg",
+                            "produces_artifacts": []
+                        }
+                    ],
+                    "tips": [
+                        "Bla bla bla"
+                    ],
+                    "tools": [
+                        {
+                            "name": "Trello",
+                            "description": "Bla bla bla",
+                            "website": "http://trello.com/"
+                        },
+                        {
+                            "name": "Apiary",
+                            "description": "Ble ble ble",
+                            "website": "http://apiary.io/"
+                        }
+                    ]
+                }
+            }
+
 
 ### Eliminar una metodología [DELETE]
-
-
 
 + Response 204
 
@@ -507,32 +809,61 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
 
 + Response 200 (application/json)
 
-        [
-            {
-                "id": "4k0f4c31aaa35d6b867dae9a7f5427t3",
-                "institution": "UAZ",
-                "email": "algo@mail.com",
-                "description": "Bla bla bla bla"
-            },
-            {
-                "id": "3t7245f7a9ead768b6d53aaa13c4f0k4",
-                "institution": "ITZ",
-                "email": "otro@mail.com",
-                "description": "Bla bla bla bla"
-            },
-        ]
+    + Attributes (array)
+        + (object)
+            + id: 4k0f4c31aaa35d6b867dae9a7f5427t3 (string) - Identificador de la entrada de feedback.
+            + institution: UAZ (string) - Nombre de la institución de origen del usuario.
+            + created_at: 2013-10-02T01:11:18.965Z (string) - Fecha y hora en la que se hizo el feedback.
+            + email: algo@mail.com (string) - Correo electrónico del usuario.
+            + finished: true (boolean) - `true` si el usuario finalizó el cuestionario, `false` en caso contrario.
+            + description: Bla bla bla bla (string) - Retroalimentación textual del usuario.
+
+    + Body
+
+            [
+                {
+                    "id": "4k0f4c31aaa35d6b867dae9a7f5427t3",
+                    "institution": "UAZ",
+                    "created_at": "2013-10-02T01:11:18.965Z",
+                    "email": "algo@mail.com",
+                    "finished": 0,
+                    "description": "Bla bla bla bla"
+                },
+                {
+                    "id": "3t7245f7a9ead768b6d53aaa13c4f0k4",
+                    "institution": "ITZ",
+                    "created_at": "2013-10-02T01:11:18.965Z",
+                    "email": "otro@mail.com",
+                    "finished": 0,
+                    "description": "Bla bla bla bla"
+                }
+            ]
 
 ### Enviar feedback [POST]
+
++ Attributes
+    + institution: UAZ (string, required) - Nombre de la institución de origen del usuario.
+    + email: algo@mail.com (string, required) - Correo electrónico del usuario.
+    + description: There's a meaning in this message. (string, nullable) - Retroalimentación textual del usuario.
+    + finished: true (boolean) - `true` si el usuario finalizó el cuestionario, `false` en caso contrario.
 
 + Request (application/json)
 
         {
             "institution": "UAZ",
-            "email": "algo@mail.com",
-            "description": "Bla bla bla bla"
+            "email": "algo@mail.com"
         }
 
 + Response 201 (application/json)
+
+    + Attributes (array)
+        + (object)
+            + id: 4k0f4c31aaa35d6b867dae9a7f5427t3 (string) - Identificador de la entrada de feedback.
+            + institution: UAZ (string) - Nombre de la institución de origen del usuario.
+            + created_at: 2013-10-02T01:11:18.965Z (string) - Fecha y hora en la que se hizo el feedback.
+            + email: algo@mail.com (string) - Correo electrónico del usuario.
+            + finished: false (boolean) - `true` si el usuario finalizó el cuestionario, `false` en caso contrario.
+            + description (string) - Retroalimentación textual del usuario.
 
     + Headers
 
@@ -543,28 +874,50 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
             {
                 "id": "4k0f4c31aaa35d6b867dae9a7f5427t3",
                 "institution": "UAZ",
-                "email": "algo@mail.com",
-                "description": "Bla bla bla bla"
+                "email": "algo@mail.com"
+                "created_at": "2013-10-02T01:11:18.965Z",
+                "finished": 0,
+                "description": null
             }
 
 ## Feedback [/feedback/{feedback_id}]
 
 + Parameters
-    + feedback_id: `4k0f4c31aaa35d6b867dae9a7f5427t3` (string, required) -
+    + feedback_id: 4k0f4c31aaa35d6b867dae9a7f5427t3 (string, required) -
       Cadena de identificación de la retroalimentación que desea manipular.
 
 ### Consultar una retroalimentación [GET]
 
 + Response 200 (application/json)
 
-        {
-            "id": "4k0f4c31aaa35d6b867dae9a7f5427t3",
-            "institution": "UAZ",
-            "email": "algo@mail.com",
-            "description": "Bla bla bla bla"
-        }
+    + Attributes (array)
+        + (object)
+            + id: 4k0f4c31aaa35d6b867dae9a7f5427t3 (string) - Identificador de la entrada de feedback.
+            + institution: UAZ (string) - Nombre de la institución de origen del usuario.
+            + created_at: 2013-10-02T01:11:18.965Z (string) - Fecha y hora en la que se hizo el feedback.
+            + email: algo@mail.com (string) - Correo electrónico del usuario.
+            + finished: true (boolean) - `true` si el usuario finalizó el cuestionario, `false` en caso contrario.
+            + description: Bla bla bla bla (string) - Retroalimentación textual del usuario.
+
+    + Body
+
+            {
+                "id": "4k0f4c31aaa35d6b867dae9a7f5427t3",
+                "created_at": "2013-10-02T01:11:18.965Z",
+                "institution": "UAZ",
+                "email": "algo@mail.com",
+                "finished": 1,
+                "description": "Bla bla bla bla"
+            }
 
 ### Editar una retroalimentación [PUT]
+
++ Attributes (array)
+    + (object)
+        + institution: UAZ (string) - Nombre de la institución de origen del usuario.
+        + email: algo@mail.com (string) - Correo electrónico del usuario.
+        + finished: true (boolean) - `true` si el usuario finalizó el cuestionario, `false` en caso contrario.
+        + description: There's a meaning in this message. (string) - Retroalimentación textual del usuario.
 
 + Request (application/json)
 
@@ -574,17 +927,29 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
 
 + Response 200 (application/json)
 
-        {
-            "id": "4k0f4c31aaa35d6b867dae9a7f5427t3",
-            "institution": "UAZ",
-            "email": "algo@mail.com",
-            "description": "There's a meaning in this message."
-        }
+    + Attributes (array)
+        + (object)
+            + id: 4k0f4c31aaa35d6b867dae9a7f5427t3 (string) - Identificador de la entrada de feedback.
+            + institution: UAZ (string) - Nombre de la institución de origen del usuario.
+            + created_at: 2013-10-02T01:11:18.965Z (string) - Fecha y hora en la que se hizo el feedback.
+            + email: algo@mail.com (string) - Correo electrónico del usuario.
+            + finished: true (boolean) - `true` si el usuario finalizó el cuestionario, `false` en caso contrario.
+            + description: There's a meaning in this message. (string) - Retroalimentación textual del usuario.
+
+    + Body
+
+            {
+                "id": "4k0f4c31aaa35d6b867dae9a7f5427t3",
+                "created_at": "2013-10-02T01:11:18.965Z",
+                "institution": "UAZ",
+                "email": "algo@mail.com",
+                "finished": true,
+                "description": "There's a meaning in this message."
+            }
 
 ### Eliminar una retroalimentación [DELETE]
 
 + Response 204
-
 
 # Group Sugerencia
 
@@ -592,24 +957,37 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
 
 ### Generar una recomendación [POST]
 
+Si no se especifica una pregunta se asume que en esa contestó `false` (`No`).
+
++ Attributes (array)
+    + (object)
+        + question: 1 (number, required) - ID de la pregunta a la cual corresponde la respuesta asociada.
+        + value: false (boolean, default) - `false` indica `No` mientras que `true` indica `Si`.
 
 + Request (application/json)
 
-        {
-            "answers": [
-                {
-                    "question": 1,
-                    "answer": 0
-                },
-                {
-                    "question": 2,
-                    "answer": 1
-                }
-            ]
-        }
+        [
+            {
+                "question": 1,
+                "value": false
+            },
+            {
+                "question": 2,
+                "value": true
+            }
+        ]
 
 
 + Response 201 (application/json)
+
+    + Attributes
+        + name: Scrum (string) - Nombre de la metodología recomendada.
+        + score: 23 (number) - Puntuación de la recomendación.
+        + links (array) - Enlaces HATEOAS
+            + (object)
+                + href: methodologies/223 (string) - Ruta relativa para consultar detalles de la metodología sugerida.
+                + rel: methodologies (string) - Recurso relacionado con el enlace.
+                + type: GET (string) - Tipo de request que debe hacerse al enlace.
 
     + Headers
 
@@ -619,6 +997,7 @@ un proyecto de software en base a las necesidades y contexto de dicho proyecto.
 
             {
                 "name": "Scrum",
+                "score" 23,
                 "links": [
                     {
                         "href": "methodologies/223",
